@@ -42,6 +42,8 @@ python main.py
 python app.py
 
 5. Endpoint: POST /predict
+
+
 Send a JSON payload with the following fields:
 
 {
