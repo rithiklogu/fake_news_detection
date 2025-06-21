@@ -35,9 +35,12 @@ cd fake-news-detection-api
 pip install -r requirements.txt
 
 3. Train the model and save all artifacts:
+
+
 python main.py
 
 4. Start the Flask API:
+
 
 python app.py
 
