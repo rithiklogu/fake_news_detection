@@ -5,13 +5,10 @@ from sklearn.decomposition import TruncatedSVD
 
 def transform_data(df):
     df["text"] = df["statement"].fillna('') + " " + df["context"].fillna('') + " " + df["job_title"].fillna('')
-
     tfidf = TfidfVectorizer(max_features=5000)
     X_tfidf = tfidf.fit_transform(df["text"])
-
     svd = TruncatedSVD(n_components=100, random_state=42)
     X_svd = svd.fit_transform(X_tfidf)
-
     label_encoders = {}
     encoded_data = []
 

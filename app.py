@@ -26,21 +26,15 @@ def predict():
         speaker = data.get("speaker", "")
         state_info = data.get("state_info", "")
         party_affiliation = data.get("party_affiliation", "")
-
         full_text = f"{statement} {context} {job_title}"
         X_text = tfidf.transform([full_text])
         X_text_svd = svd.transform(X_text)
-
         speaker_enc = safe_encode(speaker, label_encoders["speaker"], "speaker")
         state_enc = safe_encode(state_info, label_encoders["state_info"], "state_info")
         party_enc = safe_encode(party_affiliation, label_encoders["party_affiliation"], "party_affiliation")
-
         count_feats = np.array([[0, 0, 0, 0, 0]])
-
         cat_feats = np.array([[speaker_enc, state_enc, party_enc]])
         X_input = np.hstack([X_text_svd, count_feats, cat_feats])
-
-
         pred = model.predict(X_input)[0]
         label = "Real" if pred == 1 else "Fake"
 
