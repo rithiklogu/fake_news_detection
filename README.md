@@ -26,28 +26,30 @@ The model classifies a political statement as either **Real** or **Fake** based 
 
 1. Clone this repository or download the code:
 
-git clone https://github.com/yourusername/fake-news-detection-api.git
-cd fake-news-detection-api
+    git clone https://github.com/yourusername/fake-news-detection-api.git
+
+
+    cd fake-news-detection-api
 
 2. Install dependencies:
 
 
-pip install -r requirements.txt
+    pip install -r requirements.txt
 
 3. Train the model and save all artifacts:
 
 
-python main.py
+    python main.py
 
 4. Start the Flask API:
 
 
-python app.py
+    python app.py
 
 5. Endpoint: POST /predict
 
 
-Send a JSON payload with the following fields:
+    Send a JSON payload with the following fields:
 
 {
   "statement": "The earth revolves around the sun",
