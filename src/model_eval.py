@@ -2,7 +2,7 @@ from sklearn.metrics import accuracy_score, f1_score, classification_report, con
 import numpy as np
 
 def evaluate(name, y_true, y_pred):
-    print(f"\n🔹 {name} Set")
+    print(f"\n {name} Set")
     print("Accuracy:", accuracy_score(y_true, y_pred))
     print("F1 Score:", f1_score(y_true, y_pred))
     print("Classification Report:\n", classification_report(y_true, y_pred))
