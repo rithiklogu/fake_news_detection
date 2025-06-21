@@ -1,60 +1,32 @@
-import os
-import requests
-import zipfile
-import io
-import csv
+# 📁 src/data_ingestion.py
+import pandas as pd
 
-# Constants
-URL = "https://www.cs.ucsb.edu/~william/data/liar_dataset.zip"
-EXTRACT_DIR = "liar_data"
-TSV_FILES = ["train.tsv", "test.tsv", "valid.tsv"]
-CSV_FILES = ["train.csv", "test.csv", "valid.csv"]
+def load_and_clean_data(file_path):
+    df = pd.read_csv(file_path)
 
-# Column headers from LIAR dataset
-COLUMNS = [
-    "id", "label", "statement", "subject", "speaker", "job_title", "state_info",
-    "party_affiliation", "barely_true_counts", "false_counts", "half_true_counts",
-    "mostly_true_counts", "pants_on_fire_counts", "context"
-]
+    # Fill missing categorical values with mode
+    categorical_cols = ["speaker", "job_title", "state_info", "party_affiliation", "context"]
+    for col in categorical_cols:
+        df[col] = df[col].fillna(df[col].mode()[0])
 
-def download_and_extract():
-    print("Downloading dataset...")
-    response = requests.get(URL)
-    if response.status_code != 200:
-        raise Exception("Failed to download dataset.")
+    if "id" in df.columns:
+        df.drop(columns=["id"], inplace=True)
 
-    print("Extracting files...")
-    with zipfile.ZipFile(io.BytesIO(response.content)) as zip_ref:
-        zip_ref.extractall(EXTRACT_DIR)
+    # Normalize label
+    df["label"] = df["label"].astype(str).str.lower().str.strip()
 
-    print("Extraction complete.")
+    def simplify_label(label):
+        label_map = {
+            "pants-fire": 0,
+            "false": 0,
+            "barely-true": 0,
+            "half-true": 0,
+            "mostly-true": 1,
+            "true": 1
+        }
+        return label_map.get(label, -1)
 
-def convert_tsv_to_csv():
-    print("\n Converting TSV to CSV...")
-    for tsv, csv_ in zip(TSV_FILES, CSV_FILES):
-        tsv_path = os.path.join(EXTRACT_DIR, tsv)
-        csv_path = os.path.join(EXTRACT_DIR, csv_)
+    df["label"] = df["label"].apply(simplify_label)
+    df = df[df["label"] != -1]
 
-        if not os.path.exists(tsv_path):
-            print(f" Skipped (not found): {tsv_path}")
-            continue
-
-        with open(tsv_path, "r", encoding="utf-8") as tsv_file, \
-             open(csv_path, "w", encoding="utf-8", newline='') as csv_file:
-            reader = csv.reader(tsv_file, delimiter="\t")
-            writer = csv.writer(csv_file)
-            writer.writerow(COLUMNS)  # Add header
-            for row in reader:
-                if len(row) == len(COLUMNS):
-                    writer.writerow(row)
-        print(f" Saved: {csv_path}")
-
-def main():
-    if not os.path.exists(EXTRACT_DIR):
-        os.makedirs(EXTRACT_DIR)
-
-    download_and_extract()
-    convert_tsv_to_csv()
-
-if __name__ == "__main__":
-    main()
+    return df
